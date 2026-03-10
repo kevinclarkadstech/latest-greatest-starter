@@ -1,0 +1,26 @@
+{
+  "name": "@myapp/observability",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "exports": {
+    "./node": "./src/node/index.ts",
+    "./web": "./src/web/index.ts",
+    "./native": "./src/native/index.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.18.2",
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/api-logs": "^0.212.0",
+    "@opentelemetry/exporter-logs-otlp-http": "^0.212.0",
+    "@opentelemetry/sdk-logs": "^0.212.0",
+    "axe": "^13.0.0",
+    "pino": "^10.3.1"
+  }
+}
