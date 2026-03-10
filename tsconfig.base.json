@@ -5,7 +5,8 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@myapp/shared/*": ["packages/shared/src/*"]
+      "@myapp/shared/*": ["packages/shared/src/*"],
+      "@myapp/observability/*": ["packages/observability/src/*"]
     }
   }
 }
