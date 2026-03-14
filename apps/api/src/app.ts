@@ -5,8 +5,13 @@ import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import { auth } from "./auth";
 import { toNodeHandler } from "better-auth/node";
+import websocket from "@fastify/websocket";
+import { wsRoutes } from "./ws";
 
 const server = Fastify({ logger: true });
+
+server.register(websocket);
+server.register(wsRoutes);
 
 server.register(rateLimit, {
   max: 100,
