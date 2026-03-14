@@ -1,4 +1,5 @@
 import { procedure, router } from "../init";
+import { storageRouter } from "./storage-router";
 
 /**
  * This is the primary router for your server.
@@ -9,4 +10,5 @@ export const appRouter = router({
     console.log("context", ctx);
     return `Hello, ${ctx.user?.name ?? "world"}!`;
   }),
+  storage: storageRouter,
 });
