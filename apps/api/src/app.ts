@@ -2,10 +2,16 @@ import Fastify from "fastify";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { appRouter, createContext } from "./trpc";
 import cors from "@fastify/cors";
+import rateLimit from "@fastify/rate-limit";
 // import { auth } from './lib/auth';
 // import { toNodeHandler } from 'better-auth/node';
 
 const server = Fastify({ logger: true });
+
+server.register(rateLimit, {
+  max: 100,
+  timeWindow: "1 minute",
+});
 
 server.register(cors, {
   origin: "*", // Allows all origins
