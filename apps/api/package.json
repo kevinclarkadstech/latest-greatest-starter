@@ -10,7 +10,9 @@
     "test": "tsx --test src/**/*.test.ts",
     "start": "fastify start -l info dist/app.js",
     "build": "tsc -p tsconfig.build.json",
-    "dev": "tsx watch src/app.ts"
+    "dev": "tsx watch src/app.ts",
+    "auth:generate": "better-auth generate",
+    "auth:migrate": "better-auth migrate"
   },
   "keywords": [],
   "author": "",
@@ -21,12 +23,16 @@
     "@myapp/shared": "workspace:*",
     "@redis/client": "^5.11.0",
     "@trpc/server": "^11.12.0",
+    "better-auth": "^1.5.5",
     "dotenv": "^17.3.1",
     "fastify": "^5.0.0",
-    "fastify-plugin": "^5.0.0"
+    "fastify-plugin": "^5.0.0",
+    "pg": "^8.20.0"
   },
   "devDependencies": {
+    "@better-auth/cli": "^1.4.21",
     "@types/node": "^24.0.8",
+    "@types/pg": "^8.18.0",
     "fastify-cli": "^7.4.1",
     "tsx": "4.21.0",
     "typescript": "~5.9.2"
