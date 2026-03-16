@@ -6,7 +6,9 @@
     "baseUrl": ".",
     "paths": {
       "@myapp/shared/*": ["packages/shared/src/*"],
-      "@myapp/observability/*": ["packages/observability/src/*"]
+      "@myapp/observability/*": ["packages/observability/src/*"],
+      "@myapp/feature-flags": ["packages/feature-flags/src/index.ts"],
+      "@myapp/feature-flags/*": ["packages/feature-flags/src/*"]
     }
   }
 }
