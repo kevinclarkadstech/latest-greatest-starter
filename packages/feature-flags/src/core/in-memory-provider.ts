@@ -1,38 +1,15 @@
-import type { FlagEvaluationContext, FlagProvider, FlagValue } from "./types";
+import type { FlagMap, FlagProvider } from "./types";
 
-export class InMemoryFlagProvider implements FlagProvider {
-  private readonly flags: Record<string, FlagValue>;
+export class InMemoryFlagProvider<Keys extends string>
+  implements FlagProvider<Keys>
+{
+  constructor(private readonly flags: FlagMap<Keys>) {}
 
-  constructor(flags: Record<string, FlagValue> = {}) {
-    this.flags = flags;
-  }
+  async initialize(
+    _parser?: (input: unknown) => FlagMap<Keys>,
+  ): Promise<void> {}
 
-  async initialize(): Promise<void> {}
-
-  async getBooleanValue(
-    key: string,
-    defaultValue: boolean,
-    _context?: FlagEvaluationContext,
-  ): Promise<boolean> {
-    const value = this.flags[key];
-    return typeof value === "boolean" ? value : defaultValue;
-  }
-
-  async getStringValue(
-    key: string,
-    defaultValue: string,
-    _context?: FlagEvaluationContext,
-  ): Promise<string> {
-    const value = this.flags[key];
-    return typeof value === "string" ? value : defaultValue;
-  }
-
-  async getNumberValue(
-    key: string,
-    defaultValue: number,
-    _context?: FlagEvaluationContext,
-  ): Promise<number> {
-    const value = this.flags[key];
-    return typeof value === "number" ? value : defaultValue;
+  isEnabled(key: Keys): boolean {
+    return this.flags[key] ?? false;
   }
 }

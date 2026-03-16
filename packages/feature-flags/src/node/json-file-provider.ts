@@ -1,46 +1,30 @@
 import { readFile } from "fs/promises";
-import type { FlagEvaluationContext, FlagProvider, FlagValue } from "../core";
+import type { FlagMap, FlagProvider } from "../core";
+import { defaultParse } from "../core";
 
-export class JsonFileFlagProvider implements FlagProvider {
-  private flags: Record<string, FlagValue> = {};
+export class JsonFileFlagProvider<Keys extends string>
+  implements FlagProvider<Keys>
+{
+  private flags: FlagMap<Keys> = {} as FlagMap<Keys>;
 
   constructor(private readonly filePath: string) {}
 
-  async initialize(): Promise<void> {
+  async initialize(
+    parser: (input: unknown) => FlagMap<Keys> = defaultParse,
+  ): Promise<void> {
     const content = await readFile(this.filePath, "utf-8");
+    let raw: unknown;
     try {
-      this.flags = JSON.parse(content) as Record<string, FlagValue>;
-    } catch {
+      raw = JSON.parse(content);
+    } catch (err) {
       throw new Error(
-        `Failed to parse feature flags from "${this.filePath}": file contains invalid JSON`,
+        `Failed to parse feature flags from "${this.filePath}": file contains invalid JSON — ${String(err)}`,
       );
     }
+    this.flags = parser(raw);
   }
 
-  async getBooleanValue(
-    key: string,
-    defaultValue: boolean,
-    _context?: FlagEvaluationContext,
-  ): Promise<boolean> {
-    const value = this.flags[key];
-    return typeof value === "boolean" ? value : defaultValue;
-  }
-
-  async getStringValue(
-    key: string,
-    defaultValue: string,
-    _context?: FlagEvaluationContext,
-  ): Promise<string> {
-    const value = this.flags[key];
-    return typeof value === "string" ? value : defaultValue;
-  }
-
-  async getNumberValue(
-    key: string,
-    defaultValue: number,
-    _context?: FlagEvaluationContext,
-  ): Promise<number> {
-    const value = this.flags[key];
-    return typeof value === "number" ? value : defaultValue;
+  isEnabled(key: Keys): boolean {
+    return this.flags[key] ?? false;
   }
 }

@@ -1,2 +1,2 @@
-export type { FlagEvaluationContext, FlagProvider, FlagValue } from "./core";
-export { InMemoryFlagProvider } from "./core";
+export type { FlagMap, FlagProvider } from "./core";
+export { InMemoryFlagProvider, defaultParse } from "./core";
