@@ -7,6 +7,9 @@ import { auth } from "./auth";
 import { toNodeHandler } from "better-auth/node";
 import websocket from "@fastify/websocket";
 import { wsRoutes } from "./ws";
+import { serve } from "inngest/fastify";
+import { inngest } from "./infra/inngest/client";
+import { helloWorld } from "./infra/inngest/functions";
 
 const server = Fastify({ logger: true });
 
@@ -30,6 +33,15 @@ server.all("/api/auth/*", async (req, reply) => {
 server.register(fastifyTRPCPlugin, {
   prefix: "/trpc",
   trpcOptions: { router: appRouter, createContext },
+});
+
+server.route({
+  method: ["GET", "POST", "PUT"],
+  url: "/api/inngest",
+  handler: serve({
+    client: inngest,
+    functions: [helloWorld],
+  }),
 });
 
 server.get("/health", (req, reply) => {
