@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "This project was bootstrapped with Fastify-CLI.",
   "main": "src/app.ts",
-  "types": "src/trpc/index.ts",
+  "types": "src/types.ts",
   "directories": {
     "test": "test"
   },

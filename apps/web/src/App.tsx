@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
@@ -40,16 +40,19 @@ import './theme/variables.css';
 setupIonicReact();
 
 const App: React.FC = () => {
-  const [queryClient] = useState(() => new QueryClient());
-  const [trpcClient] = useState(() =>
-    trpc.createClient({
-      links: [
-        httpBatchLink({
-          url: `${import.meta.env.VITE_API_URL ?? 'http://localhost:3000'}/trpc`,
-        }),
-      ],
-    })
-  );
+  const queryClientRef = useRef<QueryClient>(null);
+  if (!queryClientRef.current) queryClientRef.current = new QueryClient();
+  const queryClient = queryClientRef.current;
+
+  const trpcClientRef = useRef<ReturnType<typeof trpc.createClient>>(null);
+  if (!trpcClientRef.current) trpcClientRef.current = trpc.createClient({
+    links: [
+      httpBatchLink({
+        url: `${import.meta.env.VITE_API_URL ?? 'http://localhost:3000'}/trpc`,
+      }),
+    ],
+  });
+  const trpcClient = trpcClientRef.current;
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
