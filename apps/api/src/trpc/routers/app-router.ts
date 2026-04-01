@@ -1,3 +1,4 @@
+import z from "zod";
 import { procedure, router } from "../init";
 import { storageRouter } from "./storage-router";
 
@@ -6,9 +7,11 @@ import { storageRouter } from "./storage-router";
  * All sub-routers are merged here.
  */
 export const appRouter = router({
-  greeting: procedure.query(({ ctx }) => {
-    console.log("context", ctx);
-    return `Hello, ${ctx.user?.name ?? "world"}!`;
-  }),
+  greeting: procedure
+    .input(z.object({ name: z.string().optional() }).optional())
+    .query(({ ctx, input }) => {
+      console.log("context", ctx);
+      return `Hello, ${input?.name ?? ctx.user?.name ?? "world"}!`;
+    }),
   storage: storageRouter,
 });
