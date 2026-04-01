@@ -1,4 +1,3 @@
-import { createContext } from "./init";
 import { appRouter } from "./routers/app-router";
 
 /**
@@ -7,4 +6,4 @@ import { appRouter } from "./routers/app-router";
  * Your frontend (Web or React Native) will import this type.
  */
 export type AppRouter = typeof appRouter;
-export { appRouter, createContext };
+export { fastifyTrpcHandler } from "./fastify-trpc-handler";

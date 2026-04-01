@@ -1,20 +1,22 @@
 import Fastify from "fastify";
-import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
-import { appRouter, createContext } from "./trpc";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import { auth } from "./auth";
 import { toNodeHandler } from "better-auth/node";
 import websocket from "@fastify/websocket";
-import { wsRoutes } from "./ws";
-import { serve } from "inngest/fastify";
-import { inngest } from "./infra/inngest/client";
+import {
+  fastifyInngestHandler,
+  fastifyWebsocketHandler,
+  fastifyTrpcHandler,
+} from "./infra";
 import { helloWorld } from "./infra/inngest/functions";
+import { appRouter } from "./infra/trpc/routers";
+import { createContext } from "./infra/trpc/init";
 
 const server = Fastify({ logger: true });
 
 server.register(websocket);
-server.register(wsRoutes);
+server.register(fastifyWebsocketHandler);
 
 server.register(rateLimit, {
   max: 100,
@@ -30,18 +32,14 @@ server.all("/api/auth/*", async (req, reply) => {
   return toNodeHandler(auth)(req.raw, reply.raw);
 });
 
-server.register(fastifyTRPCPlugin, {
-  prefix: "/trpc",
+fastifyTrpcHandler({
+  server,
   trpcOptions: { router: appRouter, createContext },
 });
 
-server.route({
-  method: ["GET", "POST", "PUT"],
-  url: "/api/inngest",
-  handler: serve({
-    client: inngest,
-    functions: [helloWorld],
-  }),
+fastifyInngestHandler({
+  server,
+  functions: [helloWorld],
 });
 
 server.get("/health", (req, reply) => {
