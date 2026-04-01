@@ -13,7 +13,7 @@ import { trpc } from "../dependencies/trpc";
 
 const Home: React.FC = () => {
   // const greeting = trpc.greeting.useQuery();
-  const greetingQuery = useQuery(trpc.greeting.queryOptions());
+  const greetingQuery = useQuery(trpc.greeting.queryOptions({ name: "World" }));
   return (
     <IonPage>
       <IonHeader>

@@ -1,13 +1,13 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
-import { auth } from "./auth";
 import { toNodeHandler } from "better-auth/node";
 import websocket from "@fastify/websocket";
 import {
   fastifyInngestHandler,
   fastifyWebsocketHandler,
   fastifyTrpcHandler,
+  fastifyAuthHandler,
 } from "./infra";
 import { helloWorld } from "./infra/inngest/functions";
 import { appRouter } from "./infra/trpc/routers";
@@ -28,9 +28,8 @@ server.register(cors, {
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Specify allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
 });
-server.all("/api/auth/*", async (req, reply) => {
-  return toNodeHandler(auth)(req.raw, reply.raw);
-});
+
+fastifyAuthHandler({ server });
 
 fastifyTrpcHandler({
   server,
