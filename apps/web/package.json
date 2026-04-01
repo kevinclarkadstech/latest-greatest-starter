@@ -19,6 +19,9 @@
     "@capacitor/status-bar": "8.0.2",
     "@ionic/react": "^8.5.0",
     "@ionic/react-router": "^8.5.0",
+    "@tanstack/react-query": "^5.96.0",
+    "@trpc/client": "^11.16.0",
+    "@trpc/react-query": "^11.16.0",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
     "ionicons": "^7.4.0",
@@ -29,6 +32,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "8.3.0",
+    "@myapp/api": "workspace:*",
     "@testing-library/dom": ">=7.21.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^16.2.0",
