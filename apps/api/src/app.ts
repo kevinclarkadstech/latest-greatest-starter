@@ -12,8 +12,18 @@ import {
 import { helloWorld } from "./infra/inngest/functions";
 import { appRouter } from "./infra/trpc/routers";
 import { createContext } from "./infra/trpc/init";
+import { logger } from "./infra/observability";
 
-const server = Fastify({ logger: true });
+const server = Fastify({});
+server.addHook("onRequest", async (request, reply) => {
+  logger.info("Incoming request??", {
+    method: request.method,
+    url: request.url,
+    // Test redaction by throwing a dummy sensitive field in here
+    ssn: "999-00-1111",
+    ip: request.ip,
+  });
+});
 
 server.register(websocket);
 server.register(fastifyWebsocketHandler);

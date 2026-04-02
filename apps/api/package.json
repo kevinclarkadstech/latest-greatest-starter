@@ -24,6 +24,7 @@
     "@fastify/cors": "^11.2.0",
     "@fastify/rate-limit": "^10.3.0",
     "@fastify/websocket": "^11.2.0",
+    "@myapp/observability": "workspace:*",
     "@myapp/shared": "workspace:*",
     "@redis/client": "^5.11.0",
     "@trpc/server": "^11.12.0",

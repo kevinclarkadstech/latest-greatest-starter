@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "moduleResolution": "Node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "strict": true,
-    "baseUrl": ".",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "paths": {
-      "@myapp/shared/*": ["packages/shared/src/*"],
-      "@myapp/observability/*": ["packages/observability/src/*"],
-      "@myapp/feature-flags": ["packages/feature-flags/src/index.ts"],
-      "@myapp/feature-flags/*": ["packages/feature-flags/src/*"]
+      "@myapp/shared/*": ["./packages/shared/src/*"],
+      "@myapp/observability/*": ["./packages/observability/src/*"],
+      "@myapp/feature-flags": ["./packages/feature-flags/src/index.ts"],
+      "@myapp/feature-flags/*": ["./packages/feature-flags/src/*"]
     }
   }
 }

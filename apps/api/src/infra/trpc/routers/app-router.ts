@@ -10,7 +10,7 @@ export const appRouter = router({
   greeting: procedure
     .input(z.object({ name: z.string().optional() }).optional())
     .query(({ ctx, input }) => {
-      console.log("context", ctx);
+      // console.log("context", ctx);
       return `Hello, ${input?.name ?? ctx.user?.name ?? "world"}!`;
     }),
   storage: storageRouter,
