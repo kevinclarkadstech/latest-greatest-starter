@@ -19,6 +19,7 @@
     "@capacitor/status-bar": "8.0.2",
     "@ionic/react": "^8.5.0",
     "@ionic/react-router": "^8.5.0",
+    "@myapp/observability": "workspace:*",
     "@tanstack/react-query": "^5.96.0",
     "@trpc/client": "^11.16.0",
     "@trpc/react-query": "^11.16.0",

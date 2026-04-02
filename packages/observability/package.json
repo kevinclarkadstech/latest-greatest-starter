@@ -4,9 +4,18 @@
   "private": true,
   "description": "",
   "exports": {
-    "./node": "./src/node/index.ts",
-    "./web": "./src/web/index.ts",
-    "./native": "./src/native/index.ts"
+    "./node": {
+      "types": "./src/node/index.ts",
+      "default": "./src/node/index.ts"
+    },
+    "./web": {
+      "types": "./src/web/index.ts",
+      "default": "./src/web/index.ts"
+    },
+    "./native": {
+      "types": "./src/native/index.ts",
+      "default": "./src/native/index.ts"
+    }
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,6 +30,7 @@
     "@opentelemetry/exporter-logs-otlp-http": "^0.212.0",
     "@opentelemetry/sdk-logs": "^0.212.0",
     "axe": "^13.0.0",
+    "cabin": "^14.0.0",
     "pino": "^10.3.1"
   }
 }
