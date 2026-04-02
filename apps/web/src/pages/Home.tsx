@@ -11,8 +11,30 @@ import "./Home.css";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "../dependencies/trpc";
 import { logger } from "../dependencies/logger";
+import { useEffect } from "react";
+import { testCache } from "../main";
 
 const Home: React.FC = () => {
+  useEffect(() => {
+    testCache.set("test-key", { value: "test-value" });
+    testCache.get("test-key").then((value) => {
+      logger.info(
+        'Cache value for "test-key":',
+        value ?? { value: "no value" },
+      );
+      testCache.clear().then(() => {
+        testCache.get("test-key").then((value) => {
+          if (value) {
+            logger.error("What?");
+          } else {
+            logger.info(
+              "Cache cleared successfully, no value found for 'test-key'",
+            );
+          }
+        });
+      });
+    });
+  }, []);
   // const greeting = trpc.greeting.useQuery();
   const greetingQuery = useQuery(trpc.greeting.queryOptions({ name: "World" }));
   logger.info("Home component rendered with greeting data", {

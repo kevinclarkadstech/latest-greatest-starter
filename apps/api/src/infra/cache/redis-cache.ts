@@ -7,90 +7,96 @@ export type RedisCacheConfig = {
   client: ReturnType<typeof createClient>;
 };
 
-export class RedisCache<T extends { [key: string]: any }> implements Cache<T> {
-  protected client: ReturnType<typeof createClient>;
-  protected prefix: string;
-  initialize: () => Promise<void>;
-  public constructor(config: RedisCacheConfig) {
-    this.initialize = config.initialize ?? (async () => {});
-    this.client = config.client;
-    this.prefix = config.prefix ?? "";
-  }
+/**
+ * Functional Factory for Redis Cache
+ */
+export function createRedisCache<T extends Record<string, any>>(
+  config: RedisCacheConfig,
+): Cache<T> {
+  const { client, prefix = "" } = config;
 
-  protected getPrefixedKey(key: string): string {
-    return `${this.prefix}${key}`;
-  }
+  // --- Private Helpers (Closures replace 'protected' methods) ---
 
-  protected async deleteKeysByPrefix(prefix: string): Promise<void> {
+  const getPrefixedKey = (key: string): string => `${prefix}${key}`;
+
+  const deleteKeysByPrefix = async function deleteKeysByPrefix(
+    scanPrefix: string,
+  ): Promise<void> {
     let keysToDelete: string[] = [];
 
-    // scanIterator handles the cursor/recursion logic for you
-    const iterator = this.client.scanIterator({
-      MATCH: `${prefix}*`,
-      COUNT: 100, // Hint for how many keys to pull from Redis per network call
+    const iterator = client.scanIterator({
+      MATCH: `${scanPrefix}*`,
+      COUNT: 100,
     });
 
     for await (const key of iterator) {
-      keysToDelete.push(...key);
+      // Reverted to your original spread logic for version 5.11.0 compatibility
+      keysToDelete.push(...(Array.isArray(key) ? key : [key]));
 
       if (keysToDelete.length >= 500) {
-        await this.client.unlink(keysToDelete);
+        await client.unlink(keysToDelete);
         keysToDelete = [];
       }
     }
 
-    // Cleanup the tail
     if (keysToDelete.length > 0) {
-      await this.client.unlink(keysToDelete);
+      await client.unlink(keysToDelete);
     }
-  }
+  };
 
-  async populate(values: T[], getKey: (value: T) => string): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-  async set(key: string, value: T): Promise<void> {
-    const completeKey = this.getPrefixedKey(key);
-    if (typeof value === "string") {
-      this.client.set(completeKey, value);
-    } else {
-      this.client.set(completeKey, JSON.stringify(value));
-    }
-  }
+  const getOrThrow = async (key: string): Promise<T> => {
+    const completeKey = getPrefixedKey(key);
+    const value = await client.get(completeKey);
 
-  protected async getOrThrow(key: string): Promise<T> {
-    const completeKey = this.getPrefixedKey(key);
-    const value = await this.client.get(completeKey);
     if (value === null) {
       throw new Error(`Key not found: ${key}`);
     }
+
     try {
+      // Redis returns strings; we check if it looks like JSON
       return JSON.parse(value) as T;
     } catch {
       return value as unknown as T;
     }
-  }
-  //   async getOrThrowAndRemove(key: string): Promise<T> {
-  //     const value = await this.getOrThrow(key);
-  //     await this.removeOne(key);
-  //     return value;
-  //   }
-  async get(key: string): Promise<T | null> {
+  };
+
+  // --- Public API ---
+
+  const set: Cache<T>["set"] = async (key, value) => {
+    const completeKey = getPrefixedKey(key);
+    const payload = typeof value === "string" ? value : JSON.stringify(value);
+    await client.set(completeKey, payload);
+  };
+
+  const get: Cache<T>["get"] = async (key) => {
     try {
-      return await this.getOrThrow(key);
+      return await getOrThrow(key);
     } catch {
       return null;
     }
-  }
-  async remove(key: string): Promise<void> {
-    const completeKey = this.getPrefixedKey(key);
-    await this.client.del(completeKey);
-  }
-  async removeMultiple(keys: string[]): Promise<void> {
-    if (keys.length === 0 || keys.length > 500) return;
-    const completeKeys = keys.map((key) => this.getPrefixedKey(key));
-    await this.client.del(completeKeys);
-  }
-  async clear(): Promise<void> {
-    await this.deleteKeysByPrefix(this.prefix);
-  }
+  };
+
+  const remove: Cache<T>["remove"] = async (key) => {
+    await client.del(getPrefixedKey(key));
+  };
+
+  const removeMultiple: Cache<T>["removeMultiple"] = async (keys) => {
+    if (keys.length === 0) return;
+    // Note: Redis del handles up to 500+ usually fine,
+    // but we respect your previous constraint logic
+    const completeKeys = keys.map(getPrefixedKey);
+    await client.del(completeKeys);
+  };
+
+  const clear: Cache<T>["clear"] = async () => {
+    await deleteKeysByPrefix(prefix);
+  };
+
+  return {
+    set,
+    get,
+    remove,
+    removeMultiple,
+    clear,
+  };
 }
