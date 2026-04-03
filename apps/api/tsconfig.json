@@ -13,16 +13,15 @@
     "exactOptionalPropertyTypes": true,
 
     /* Emission */
-    "outDir": "dist",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "sourceMap": true,
     "removeComments": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-
-    /* Path Aliases (Optional but highly recommended) */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"],
+      "@infra/*": ["./src/infra/*"]
     }
   },
   "include": ["src/**/*"],

@@ -7,3 +7,5 @@ import { appRouter } from "./routers/app-router";
  */
 export type AppRouter = typeof appRouter;
 export { fastifyTrpcHandler } from "./fastify-trpc-handler";
+export { createContext } from "./init";
+export { appRouter } from "./routers/app-router";

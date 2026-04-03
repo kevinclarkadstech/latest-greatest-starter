@@ -1,20 +1,31 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
-import { toNodeHandler } from "better-auth/node";
 import websocket from "@fastify/websocket";
 import {
   fastifyInngestHandler,
   fastifyWebsocketHandler,
   fastifyTrpcHandler,
   fastifyAuthHandler,
-} from "./infra";
-import { helloWorld } from "./infra/inngest/functions";
-import { appRouter } from "./infra/trpc/routers";
-import { createContext } from "./infra/trpc/init";
-import { logger } from "./infra/observability";
+  helloWorld,
+  appRouter,
+  createContext,
+  logger,
+  createBetterAuthClient,
+  createDb,
+} from "@/infra";
 
 const server = Fastify({});
+
+/**Singletons */
+const db = createDb({
+  connectionString: process.env.DB_CONNECTION_STRING!,
+  driver: "node",
+});
+
+const betterAuthClient = createBetterAuthClient({ db });
+/** End singletons */
+
 server.addHook("onRequest", async (request, reply) => {
   logger.info("Incoming request??", {
     method: request.method,
@@ -39,7 +50,11 @@ server.register(cors, {
   allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
 });
 
-fastifyAuthHandler({ server });
+fastifyAuthHandler({
+  server,
+  authClient: betterAuthClient,
+  path: "/api/auth/*",
+});
 
 fastifyTrpcHandler({
   server,
