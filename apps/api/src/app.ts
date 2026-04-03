@@ -13,12 +13,13 @@ import {
   logger,
   createBetterAuthClient,
   createDb,
+  AppDb,
 } from "@/infra";
 
 const server = Fastify({});
 
 /**Singletons */
-const db = createDb({
+const db: AppDb = createDb({
   connectionString: process.env.DB_CONNECTION_STRING!,
   driver: "node",
 });

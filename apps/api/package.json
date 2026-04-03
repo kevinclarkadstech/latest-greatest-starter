@@ -12,8 +12,11 @@
     "start": "fastify start -l info dist/app.js",
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsx watch src/app.ts",
-    "auth:generate": "better-auth generate",
-    "auth:migrate": "better-auth migrate"
+    "auth:sync": "pnpm dlx auth@latest generate --config ./src/infra/auth/better-auth.config.ts --output ./src/infra/db/schema/auth.ts",
+    "db:generate": "drizzle-kit generate --config ./src/infra/db/drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config ./src/infra/db/drizzle.config.ts",
+    "db:rollback": "drizzle-kit rollback --config ./src/infra/db/drizzle.config.ts",
+    "db:status": "drizzle-kit status --config ./src/infra/db/drizzle.config.ts"
   },
   "keywords": [],
   "author": "",
