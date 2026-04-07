@@ -21,6 +21,8 @@ export const authConfig = {
   },
   plugins: [
     emailOtp({
+      // NOTE: This logs the OTP for development only.
+      // Replace with actual email delivery (e.g. SendGrid, Resend) before going to production.
       async sendVerificationOTP({ email, otp, type }: { email: string; otp: string; type: string }) {
         logger.info("Email OTP verification code", { email, otp, type });
       },
