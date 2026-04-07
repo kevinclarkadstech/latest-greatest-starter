@@ -1,6 +1,6 @@
 import { betterAuth, BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { emailOtp } from "better-auth/plugins";
+import { emailOTP } from "better-auth/plugins";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -25,7 +25,7 @@ export const authConfig = {
     .split(",")
     .map((s) => s.trim()),
   plugins: [
-    emailOtp({
+    emailOTP({
       // NOTE: This logs the OTP for development only.
       // Replace with actual email delivery (e.g. SendGrid, Resend) before going to production.
       async sendVerificationOTP({ email, otp, type }: { email: string; otp: string; type: string }) {
