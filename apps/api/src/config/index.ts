@@ -1,13 +1,13 @@
 import z from "zod";
 import dotenv from "dotenv";
 
-type AppConfig = {
-  API_KEY: string;
-};
-
 const AppConfigSchema = z.object({
-  API_KEY: z.string(),
+  BETTER_AUTH_SECRET: z.string(),
+  BETTER_AUTH_URL: z.url(),
+  DATABASE_URL: z.string(),
 });
+
+type AppConfig = z.infer<typeof AppConfigSchema>;
 
 function createConfig(
   input: Record<string, string | undefined> = process.env,

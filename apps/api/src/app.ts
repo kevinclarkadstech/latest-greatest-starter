@@ -15,27 +15,22 @@ import {
   createDb,
   AppDb,
 } from "@/infra";
+import { fromNodeHeaders } from "better-auth/node";
+import { createConfig } from "./config";
 
-const server = Fastify({});
+const server = Fastify({
+  logger: true,
+});
+const config = createConfig();
 
 /**Singletons */
 const db: AppDb = createDb({
-  connectionString: process.env.DB_CONNECTION_STRING!,
+  connectionString: config.DATABASE_URL,
   driver: "node",
 });
 
-const betterAuthClient = createBetterAuthClient({ db });
+const betterAuthClient = createBetterAuthClient({ db, logger });
 /** End singletons */
-
-server.addHook("onRequest", async (request, reply) => {
-  logger.info("Incoming request??", {
-    method: request.method,
-    url: request.url,
-    // Test redaction by throwing a dummy sensitive field in here
-    ssn: "999-00-1111",
-    ip: request.ip,
-  });
-});
 
 server.register(websocket);
 server.register(fastifyWebsocketHandler);
@@ -46,15 +41,18 @@ server.register(rateLimit, {
 });
 
 server.register(cors, {
-  origin: "*", // Allows all origins
+  origin: ["http://localhost:5174", "http://localhost:5173"], // Allow requests from this origin
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Specify allowed methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Specify allowed headers
+  credentials: true, // Allow cookies to be sent
+  preflightContinue: true, // Pass the CORS preflight response to the next handler
 });
 
 fastifyAuthHandler({
   server,
   authClient: betterAuthClient,
   path: "/api/auth/*",
+  logger,
 });
 
 fastifyTrpcHandler({
@@ -69,6 +67,11 @@ fastifyInngestHandler({
 
 server.get("/health", (req, reply) => {
   reply.send({ status: "ok" });
+});
+
+server.setNotFoundHandler((request, reply) => {
+  console.log("This route does not exist:", request.method, request.url);
+  reply.code(404).send({ error: "Route not found" });
 });
 
 server.listen({ port: 3000 });
