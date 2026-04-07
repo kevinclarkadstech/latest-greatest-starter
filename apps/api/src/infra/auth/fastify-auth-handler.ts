@@ -21,17 +21,23 @@ export function fastifyAuthHandler({
       );
       const headers = fromNodeHeaders(request.headers);
 
+      const hasBody =
+        request.method !== "GET" &&
+        request.method !== "HEAD" &&
+        request.body != null;
+
       const req = new Request(url.toString(), {
         method: request.method,
         headers,
-        ...(request.body ? { body: JSON.stringify(request.body) } : {}),
+        ...(hasBody ? { body: JSON.stringify(request.body) } : {}),
       });
 
       const response = await authClient.handler(req);
 
       reply.status(response.status);
       response.headers.forEach((value, key) => reply.header(key, value));
-      reply.send(response.body ? await response.text() : null);
+      const body = response.body ? await response.text() : null;
+      reply.send(body);
     },
   });
 }
