@@ -46,7 +46,10 @@ server.register(rateLimit, {
 });
 
 server.register(cors, {
-  origin: "*", // Allows all origins
+  origin: (process.env.CORS_ORIGIN ?? "http://localhost:5173")
+    .split(",")
+    .map((s) => s.trim()),
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Specify allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
 });

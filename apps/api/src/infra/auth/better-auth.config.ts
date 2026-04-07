@@ -1,7 +1,10 @@
 import { betterAuth, BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { emailOTP } from "better-auth/plugins";
 import dotenv from "dotenv";
 dotenv.config();
+
+import { logger } from "../observability";
 
 const fakeDb = {} as any; // Placeholder, will be overridden in the actual client
 
@@ -16,6 +19,20 @@ export const authConfig = {
   emailAndPassword: {
     enabled: true,
   },
+  // Allow cross-origin requests from the web app.
+  // toNodeHandler bypasses @fastify/cors, so Better Auth must handle its own CORS.
+  trustedOrigins: (process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? "http://localhost:5173")
+    .split(",")
+    .map((s) => s.trim()),
+  plugins: [
+    emailOTP({
+      // NOTE: This logs the OTP for development only.
+      // Replace with actual email delivery (e.g. SendGrid, Resend) before going to production.
+      async sendVerificationOTP({ email, otp, type }: { email: string; otp: string; type: string }) {
+        logger.info("Email OTP verification code", { email, otp, type });
+      },
+    }),
+  ],
   // Add any other plugins here (e.g., secondaryAuth, organizations)
   // so the CLI knows which tables to build.
 } satisfies BetterAuthOptions;
