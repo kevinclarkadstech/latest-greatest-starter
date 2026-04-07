@@ -19,6 +19,11 @@ export const authConfig = {
   emailAndPassword: {
     enabled: true,
   },
+  // Allow cross-origin requests from the web app.
+  // toNodeHandler bypasses @fastify/cors, so Better Auth must handle its own CORS.
+  trustedOrigins: (process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? "http://localhost:5173")
+    .split(",")
+    .map((s) => s.trim()),
   plugins: [
     emailOtp({
       // NOTE: This logs the OTP for development only.
