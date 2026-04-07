@@ -1,7 +1,10 @@
 import { betterAuth, BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { emailOtp } from "better-auth/plugins";
 import dotenv from "dotenv";
 dotenv.config();
+
+import { logger } from "../observability";
 
 const fakeDb = {} as any; // Placeholder, will be overridden in the actual client
 
@@ -16,6 +19,13 @@ export const authConfig = {
   emailAndPassword: {
     enabled: true,
   },
+  plugins: [
+    emailOtp({
+      async sendVerificationOTP({ email, otp, type }: { email: string; otp: string; type: string }) {
+        logger.info("Email OTP verification code", { email, otp, type });
+      },
+    }),
+  ],
   // Add any other plugins here (e.g., secondaryAuth, organizations)
   // so the CLI knows which tables to build.
 } satisfies BetterAuthOptions;
