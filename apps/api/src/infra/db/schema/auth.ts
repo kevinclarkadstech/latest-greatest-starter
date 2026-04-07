@@ -12,6 +12,9 @@ export const user = pgTable("user", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  onboardingCompletedAt: timestamp("onboarding_completed_at"),
+  username: text("username").unique(),
+  displayUsername: text("display_username"),
 });
 
 export const session = pgTable(

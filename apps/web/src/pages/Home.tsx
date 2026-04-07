@@ -1,6 +1,11 @@
 import {
+  IonButton,
   IonContent,
   IonHeader,
+  IonInput,
+  IonItem,
+  IonList,
+  IonModal,
   IonPage,
   IonTitle,
   IonToolbar,
@@ -11,10 +16,19 @@ import "./Home.css";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "../dependencies/trpc";
 import { logger } from "../dependencies/logger";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { testCache } from "../main";
+import { authClient } from "../dependencies";
+import { emailOTP } from "better-auth/plugins/email-otp";
 
 const Home: React.FC = () => {
+  const [loginDetails, setLoginDetails] = useState<{
+    email: string;
+    verificationCode: string;
+  }>({ email: "", verificationCode: "" });
+  const [isEnteringVerificationCode, setIsEnteringVerificationCode] =
+    useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   useEffect(() => {
     testCache.set("test-key", { value: "test-value" });
     testCache.get("test-key").then((value) => {
@@ -62,6 +76,92 @@ const Home: React.FC = () => {
           <p style={{ textAlign: "center" }}>{greetingQuery.data}</p>
         )}
         <ExploreContainer />
+        <IonButton onClick={() => setIsLoginModalOpen(true)}>
+          Open Login Modal
+        </IonButton>
+        <IonModal
+          isOpen={isLoginModalOpen}
+          onDidDismiss={() => setIsLoginModalOpen(false)}
+        >
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>Modal Title</IonTitle>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent>
+            <IonList>
+              <IonItem>
+                <IonInput
+                  label="Email"
+                  type="email"
+                  value={loginDetails.email}
+                  readonly={isEnteringVerificationCode}
+                  onIonChange={(e) =>
+                    setLoginDetails({ ...loginDetails, email: e.detail.value! })
+                  }
+                />
+              </IonItem>
+              {isEnteringVerificationCode && (
+                <>
+                  <IonItem>
+                    <IonInput
+                      label="Verification Code"
+                      value={loginDetails.verificationCode}
+                      onIonChange={(e) =>
+                        setLoginDetails({
+                          ...loginDetails,
+                          verificationCode: e.detail.value!,
+                        })
+                      }
+                    />
+                  </IonItem>
+                </>
+              )}
+
+              {!isEnteringVerificationCode && (
+                <IonButton
+                  onClick={async () => {
+                    setIsEnteringVerificationCode(true);
+                    logger.info("Requesting verification code for email", {
+                      email: loginDetails.email,
+                    });
+                    await authClient.emailOtp.sendVerificationOtp({
+                      email: loginDetails.email,
+                      type: "sign-in",
+                    });
+                  }}
+                >
+                  Get Verification Code
+                </IonButton>
+              )}
+              {isEnteringVerificationCode && (
+                <IonButton
+                  onClick={async () => {
+                    try {
+                      // Handle verification code submission
+                      logger.info("Submitting login details", { loginDetails });
+                      const result = await authClient.signIn.emailOtp({
+                        email: loginDetails.email,
+                        otp: loginDetails.verificationCode,
+                        username: "freddy",
+                      });
+                      if (result.error) {
+                        throw new Error(result.error.message);
+                      }
+                      const { user } = result.data;
+                      console.log("got user data", user);
+                      setIsLoginModalOpen(false);
+                    } catch (error) {
+                      logger.error("Login failed", { error });
+                    }
+                  }}
+                >
+                  Submit Verification Code
+                </IonButton>
+              )}
+            </IonList>
+          </IonContent>
+        </IonModal>
       </IonContent>
     </IonPage>
   );
