@@ -1,2 +1,2 @@
-export { fastifyAuthHandler } from "./fastify-auth-handler";
+export { registerAuthRoutes } from "./hono-auth-handler";
 export { createBetterAuthClient } from "./better-auth";

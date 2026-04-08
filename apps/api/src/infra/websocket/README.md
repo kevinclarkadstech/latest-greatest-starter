@@ -1,6 +1,6 @@
 # WebSocket / Realtime
 
-Built on [`@fastify/websocket`](https://github.com/fastify/fastify-websocket). The `ConnectionManager` class is a singleton that tracks every live connection and makes it easy to push events from anywhere in the API.
+Built on [`@hono/node-server`](https://github.com/honojs/node-server) WebSocket support. The `ConnectionManager` class is a singleton that tracks every live connection and makes it easy to push events from anywhere in the API.
 
 ## Connection endpoint
 

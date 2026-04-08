@@ -6,6 +6,6 @@ import { appRouter } from "./routers/app-router";
  * Your frontend (Web or React Native) will import this type.
  */
 export type AppRouter = typeof appRouter;
-export { fastifyTrpcHandler } from "./fastify-trpc-handler";
+export { registerTrpcRoutes } from "./hono-trpc-handler";
 export { createContext } from "./init";
 export { appRouter } from "./routers/app-router";

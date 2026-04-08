@@ -1,1 +1,1 @@
-export { fastifyWebsocketHandler } from "./fastify-websocket-handler";
+export { attachWebSocketServer } from "./hono-websocket-handler";

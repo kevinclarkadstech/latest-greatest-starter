@@ -41,9 +41,10 @@ export const myFunction = inngest.createFunction(
 Then register it in `app.ts`:
 
 ```ts
+import { registerInngestRoutes } from "./infra/inngest";
 import { myFunction } from "./infra/inngest/functions";
 
-server.route(serve({ client: inngest, functions: [helloWorld, myFunction] }));
+registerInngestRoutes({ app, functions: [helloWorld, myFunction] });
 ```
 
 ---
