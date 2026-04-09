@@ -3,6 +3,16 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { emailOTP } from "better-auth/plugins/email-otp";
 import dotenv from "dotenv";
+import {
+  account,
+  accountRelations,
+  additionalUserFields,
+  session,
+  sessionRelations,
+  user,
+  userRelations,
+  verification,
+} from "../../domains/users/db/schema";
 dotenv.config();
 
 const fakeDb = {} as any; // Placeholder, will be overridden in the actual client
@@ -11,10 +21,26 @@ const fakeDb = {} as any; // Placeholder, will be overridden in the actual clien
 // to know which plugins we're using and generate the appropriate schema.
 // The actual database instance will be provided when we create the auth client.
 export const authConfig: BetterAuthOptions = {
+  user: {
+    additionalFields: {
+      ...additionalUserFields,
+    },
+  },
   trustedOrigins: ["http://localhost:5174", "http://localhost:5173"],
   // We leave the database as a placeholder because
   // the CLI only needs to see the PLUGINS to generate the schema.
-  database: drizzleAdapter(fakeDb, { provider: "pg" }), // Placeholder, will be overridden in the actual client
+  database: drizzleAdapter(fakeDb, {
+    provider: "pg",
+    schema: {
+      user,
+      account,
+      session,
+      verification,
+      userRelations,
+      sessionRelations,
+      accountRelations,
+    },
+  }), // Placeholder, will be overridden in the actual client
   emailAndPassword: {
     enabled: false,
   },

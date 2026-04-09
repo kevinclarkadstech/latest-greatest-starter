@@ -8,7 +8,7 @@ import {
 } from "drizzle-orm/node-postgres";
 import { neon } from "@neondatabase/serverless";
 import { Pool } from "pg";
-import * as schema from "./schema";
+import { schema } from "./schema";
 
 export type DbConfig = {
   connectionString: string;
