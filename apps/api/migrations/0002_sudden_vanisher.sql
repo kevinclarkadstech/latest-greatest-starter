@@ -1,0 +1,1 @@
+ALTER TABLE "user" ALTER COLUMN "onboarded_at" DROP NOT NULL;
