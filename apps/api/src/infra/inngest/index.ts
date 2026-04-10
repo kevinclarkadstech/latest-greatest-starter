@@ -1,2 +1,2 @@
-export { fastifyInngestHandler } from "./fastify-inngest-handler";
+export { registerInngestRoutes } from "./hono-inngest-handler";
 export { helloWorld } from "./functions";

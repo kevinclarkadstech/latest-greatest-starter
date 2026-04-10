@@ -1,5 +1,6 @@
-import type { FastifyInstance } from "fastify";
-import type { WebSocket } from "ws";
+import type { Server } from "node:http";
+import type { ServerType } from "@hono/node-server";
+import { WebSocket, WebSocketServer } from "ws";
 import { randomUUID } from "crypto";
 import { z } from "zod";
 import { connectionManager } from "./connection-manager";
@@ -17,12 +18,25 @@ const InboundMessage = z.discriminatedUnion("type", [
 
 type InboundMessage = z.infer<typeof InboundMessage>;
 
-export async function fastifyWebsocketHandler(fastify: FastifyInstance) {
-  fastify.get("/ws", { websocket: true }, (socket: WebSocket, req) => {
+/**
+ * Attach a WebSocket server to the given HTTP server instance.
+ * WebSocket upgrades are handled on `ws://host/ws`.
+ *
+ * Note: WebSocket is only supported over HTTP/1.1.  When using
+ * `@hono/node-server`, the returned `ServerType` is always an HTTP/1.1
+ * server unless HTTP/2 options are passed, so the cast below is safe for
+ * the default configuration.
+ */
+export function attachWebSocketServer(httpServer: ServerType) {
+  const wss = new WebSocketServer({
+    server: httpServer as Server,
+    path: "/ws",
+  });
+
+  wss.on("connection", (socket: WebSocket) => {
     const id = randomUUID();
 
     connectionManager.add(id, socket);
-
     connectionManager.send(id, { type: "connected", payload: { id } });
 
     socket.on("message", (raw) => {
