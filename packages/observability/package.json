@@ -32,5 +32,8 @@
     "axe": "^13.0.0",
     "cabin": "^14.0.0",
     "pino": "^10.3.1"
+  },
+  "devDependencies": {
+    "pino-pretty": "13.1.3"
   }
 }
