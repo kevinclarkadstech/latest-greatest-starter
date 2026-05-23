@@ -10,7 +10,9 @@
       "@myapp/shared/*": ["./packages/shared/src/*"],
       "@myapp/observability/*": ["./packages/observability/src/*"],
       "@myapp/feature-flags": ["./packages/feature-flags/src/index.ts"],
-      "@myapp/feature-flags/*": ["./packages/feature-flags/src/*"]
+      "@myapp/feature-flags/*": ["./packages/feature-flags/src/*"],
+      "@myapp/ui": ["./packages/ui/src/index.ts"],
+      "@myapp/ui/*": ["./packages/ui/src/*"]
     }
   }
 }
